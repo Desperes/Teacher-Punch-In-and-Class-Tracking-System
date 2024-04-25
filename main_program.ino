@@ -103,8 +103,7 @@ void loop() {
         }
     }
     return 0;
-    
-  }
+  
   // put your main code here, to run repeatedly:
   if(checkFingerprintID()==1)
   {
