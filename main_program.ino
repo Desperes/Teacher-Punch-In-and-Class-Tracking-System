@@ -27,6 +27,15 @@ const char* subject[][7] = {
     {"THURSDAY", "ME", "EM", "IT", "MP", "MP", "MP"},
     {"FRIDAY", "IT", "EM", "ME", "HO", "MI", "MI"}
 };
+
+int mapping[5][6] = {
+    {1, 4, 5, 6, 7, 8},    // 0th Element = Monday
+    {2, 4, 6, 8, 3, 5},    // 1st Element = Tuesday
+    {4, 5, 6, 2, 1, 3},
+    {1, 4, 5, 6, 7, 5},
+    {4, 5, 6, 2, 1, 5}
+};
+
 char attendance[5][6][20]; // Assuming each string can be up to 19 characters long
 void setup() {
   Serial.begin(9600);
@@ -72,219 +81,244 @@ void setup() {
   }
 }
 void loop() {
-  if(InterruptFlag)
-  {
-    switch(rtc.dayOfWeek())
-    {
-      case 1: switch(rtc.hour())
-              {
-                  case 9: if(checkFingerprintID()==1)
-                          {
-                            strcpy(attendance[0][0], "present");
-                          }
-                          else
-                          {
-                            strcpy(attendance[0][0], "absent");
-                          }
-                  case 10: if(checkFingerprintID()==2)
-                           {
-                            strcpy(attendance[0][1], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[0][1], "absent");
-                           }
-                  case 11: if(checkFingerprintID()==2)
-                           {
-                            strcpy(attendance[0][2], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[0][2], "absent");
-                           }
-                  case 13: if(checkFingerprintID()==3)
-                           {
-                            strcpy(attendance[0][3], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[0][3], "absent");
-                           }
-                  case 14: if(checkFingerprintID()==4)
-                           {
-                            strcpy(attendance[0][4], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[0][4], "absent");
-                           }
-                  case 15: if(checkFingerprintID()==5)
-                           {
-                            strcpy(attendance[0][5], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[0][5], "absent");
-                           }
-                  default: InterruptFlag=false;
-              }
-      case 2: switch(rtc.hour())
-              {
-                  case 9: if(checkFingerprintID()==2)
-                          {
-                            strcpy(attendance[1][0], "present");
-                          }
-                          else
-                          {
-                            strcpy(attendance[1][0], "absent");
-                          }
-                  case 10: if(checkFingerprintID()==4)
-                           {
-                            strcpy(attendance[1][1], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[1][1], "absent");
-                           }
-                  case 11: if(checkFingerprintID()==1)
-                           {
-                            strcpy(attendance[1][2], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[1][2], "absent");
-                           }
-                  case 13: if(checkFingerprintID()==6)
-                           {
-                            strcpy(attendance[1][3], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[1][3], "absent");
-                           }
-                  case 14: if(checkFingerprintID()==6)
-                           {
-                            strcpy(attendance[1][4], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[1][4], "absent");
-                           }
-                  case 15: if(checkFingerprintID()==6)
-                           {
-                            strcpy(attendance[1][5], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[1][5], "absent");
-                           }
-                  default: InterruptFlag=false;
-              }
-      case 3: switch(rtc.hour())
-              {
-                  case 9: if(checkFingerprintID()==1)
-                          {
-                            strcpy(attendance[2][0], "present");
-                          }
-                          else
-                          {
-                            strcpy(attendance[2][0], "absent");
-                          }
-                  case 10: if(checkFingerprintID()==8)
-                           {
-                            strcpy(attendance[2][1], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[2][1], "absent");
-                           }
-                  case 11: if(checkFingerprintID()==2)
-                           {
-                            strcpy(attendance[2][2], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[2][2], "absent");
-                           }
-                  case 13: if(checkFingerprintID()==3)
-                           {
-                            strcpy(attendance[2][3], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[2][3], "absent");
-                           }
-                  case 14: if(checkFingerprintID()==7)
-                           {
-                            strcpy(attendance[2][4], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[2][4], "absent");
-                           }
-                  case 15: if(checkFingerprintID()==5)
-                           {
-                            strcpy(attendance[2][5], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[2][5], "absent");
-                           }
-                  default: InterruptFlag=false;
-              }
-      case 4: switch(rtc.hour())
-              {
-                  case 9: if(checkFingerprintID()==8)
-                          {
-                            strcpy(attendance[3][0], "present");
-                          }
-                          else
-                          {
-                            strcpy(attendance[3][0], "absent");
-                          }
-                  case 10: if(checkFingerprintID()==3)
-                           {
-                            strcpy(attendance[3][1], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[3][1], "absent");
-                           }
-                  case 11: if(checkFingerprintID()==4)
-                           {
-                            strcpy(attendance[3][2], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[3][2], "absent");
-                           }
-                  case 13: if(checkFingerprintID()==6)
-                           {
-                            strcpy(attendance[3][3], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[3][3], "absent");
-                           }
-                  case 14: if(checkFingerprintID()==6)
-                           {
-                            strcpy(attendance[3][4], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[3][4], "absent");
-                           }
-                  case 15: if(checkFingerprintID()==6)
-                           {
-                            strcpy(attendance[3][5], "present");
-                           }
-                           else
-                           {
-                            strcpy(attendance[3][5], "absent");
-                           }
-                  default: InterruptFlag=false;
-              }
+  // if(InterruptFlag)
+  // {
+  //   switch(rtc.dayOfWeek())
+  //   {
+  //     case 1: switch(rtc.hour())
+  //             {
+  //                 case 9: if(checkFingerprintID()==1)
+  //                         {
+  //                           strcpy(attendance[0][0], "present");
+  //                         }
+  //                         else
+  //                         {
+  //                           strcpy(attendance[0][0], "absent");
+  //                         }
+  //                 case 10: if(checkFingerprintID()==2)
+  //                          {
+  //                           strcpy(attendance[0][1], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[0][1], "absent");
+  //                          }
+  //                 case 11: if(checkFingerprintID()==2)
+  //                          {
+  //                           strcpy(attendance[0][2], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[0][2], "absent");
+  //                          }
+  //                 case 13: if(checkFingerprintID()==3)
+  //                          {
+  //                           strcpy(attendance[0][3], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[0][3], "absent");
+  //                          }
+  //                 case 14: if(checkFingerprintID()==4)
+  //                          {
+  //                           strcpy(attendance[0][4], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[0][4], "absent");
+  //                          }
+  //                 case 15: if(checkFingerprintID()==5)
+  //                          {
+  //                           strcpy(attendance[0][5], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[0][5], "absent");
+  //                          }
+  //                 default: InterruptFlag=false;
+  //             }
+  //     case 2: switch(rtc.hour())
+  //             {
+  //                 case 9: if(checkFingerprintID()==2)
+  //                         {
+  //                           strcpy(attendance[1][0], "present");
+  //                         }
+  //                         else
+  //                         {
+  //                           strcpy(attendance[1][0], "absent");
+  //                         }
+  //                 case 10: if(checkFingerprintID()==4)
+  //                          {
+  //                           strcpy(attendance[1][1], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[1][1], "absent");
+  //                          }
+  //                 case 11: if(checkFingerprintID()==1)
+  //                          {
+  //                           strcpy(attendance[1][2], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[1][2], "absent");
+  //                          }
+  //                 case 13: if(checkFingerprintID()==6)
+  //                          {
+  //                           strcpy(attendance[1][3], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[1][3], "absent");
+  //                          }
+  //                 case 14: if(checkFingerprintID()==6)
+  //                          {
+  //                           strcpy(attendance[1][4], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[1][4], "absent");
+  //                          }
+  //                 case 15: if(checkFingerprintID()==6)
+  //                          {
+  //                           strcpy(attendance[1][5], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[1][5], "absent");
+  //                          }
+  //                 default: InterruptFlag=false;
+  //             }
+  //     case 3: switch(rtc.hour())
+  //             {
+  //                 case 9: if(checkFingerprintID()==1)
+  //                         {
+  //                           strcpy(attendance[2][0], "present");
+  //                         }
+  //                         else
+  //                         {
+  //                           strcpy(attendance[2][0], "absent");
+  //                         }
+  //                 case 10: if(checkFingerprintID()==8)
+  //                          {
+  //                           strcpy(attendance[2][1], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[2][1], "absent");
+  //                          }
+  //                 case 11: if(checkFingerprintID()==2)
+  //                          {
+  //                           strcpy(attendance[2][2], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[2][2], "absent");
+  //                          }
+  //                 case 13: if(checkFingerprintID()==3)
+  //                          {
+  //                           strcpy(attendance[2][3], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[2][3], "absent");
+  //                          }
+  //                 case 14: if(checkFingerprintID()==7)
+  //                          {
+  //                           strcpy(attendance[2][4], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[2][4], "absent");
+  //                          }
+  //                 case 15: if(checkFingerprintID()==5)
+  //                          {
+  //                           strcpy(attendance[2][5], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[2][5], "absent");
+  //                          }
+  //                 default: InterruptFlag=false;
+  //             }
+  //     case 4: switch(rtc.hour())
+  //             {
+  //                 case 9: if(checkFingerprintID()==8)
+  //                         {
+  //                           strcpy(attendance[3][0], "present");
+  //                         }
+  //                         else
+  //                         {
+  //                           strcpy(attendance[3][0], "absent");
+  //                         }
+  //                 case 10: if(checkFingerprintID()==3)
+  //                          {
+  //                           strcpy(attendance[3][1], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[3][1], "absent");
+  //                          }
+  //                 case 11: if(checkFingerprintID()==4)
+  //                          {
+  //                           strcpy(attendance[3][2], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[3][2], "absent");
+  //                          }
+  //                 case 13: if(checkFingerprintID()==6)
+  //                          {
+  //                           strcpy(attendance[3][3], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[3][3], "absent");
+  //                          }
+  //                 case 14: if(checkFingerprintID()==6)
+  //                          {
+  //                           strcpy(attendance[3][4], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[3][4], "absent");
+  //                          }
+  //                 case 15: if(checkFingerprintID()==6)
+  //                          {
+  //                           strcpy(attendance[3][5], "present");
+  //                          }
+  //                          else
+  //                          {
+  //                           strcpy(attendance[3][5], "absent");
+  //                          }
+  //                 default: InterruptFlag=false;
+  //             }
+  //   }
+  // }
+
+  if (InterruptFlag) {
+        int day = rtc.now().dayOfTheWeek();
+        int hour = rtc.now().hour();
+        if (day == 0 || day == 6) 
+          return 0;    // if the day is sat or sunday come out of the if condition
+
+        if (hour < 12) {                      // excluding 12pm
+            if (checkFingerprintID()== mapping[day-1][hour-9]) {
+                strcpy(attendance[day-1][hour-9], "present");
+            } else {
+                strcpy(attendance[day-1][hour-9], "0");
+
+            }
+        } else if (hour > 12) {
+            if (checkFingerprintID()== mapping[day-1][hour-10]) {
+                strcpy(attendance[day-1][hour-10], "present");
+            } else {
+                strcpy(attendance[day-1][hour-10], "0");
+            }
+        }
     }
+    return 0;
+    
   }
   // put your main code here, to run repeatedly:
   if(checkFingerprintID()==1)
