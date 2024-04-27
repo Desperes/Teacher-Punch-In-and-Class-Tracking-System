@@ -213,10 +213,8 @@ void leftButtonISR()
     }
     // Redraw the schedule for the new day
     DisplayTable((const char **)subject,attendance,currentDay);
-      delay(200); // Debounce delay
-  // Code to execute when the left button is pressed
+}    
 
-}
 
 void rightButtonISR()
 {
@@ -226,7 +224,7 @@ void rightButtonISR()
     }
     // Redraw the schedule for the new day
     DisplayTable((const char **)subject,attendance,currentDay);
-    delay(200);
+    
 }
 
 
