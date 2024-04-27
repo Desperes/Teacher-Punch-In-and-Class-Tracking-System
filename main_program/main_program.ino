@@ -18,10 +18,10 @@
 #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-// SoftwareSerial mySerial(FINGERPRINT_RX_PIN, FINGERPRINT_TX_PIN);
-// Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
+SoftwareSerial mySerial(FINGERPRINT_RX_PIN, FINGERPRINT_TX_PIN);
+Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
 volatile bool InterruptFlag = false;
-const char PROGMEM subject[][11] = {
+const char PROGMEM subject[][8] = {
     "MONDAY", "EL", "VL", "VL", "EM", "IT", "HO",
     "TUESDAY", "VL", "IT", "EL", "MP", "MP", "MP",
     "WEDNESDAY", "EL", "ME", "VL", "EM", "CW", "HO",
@@ -36,21 +36,22 @@ const char PROGMEM subject[][11] = {
 //     {"THURSDAY", "ME", "EM", "IT", "MP", "MP", "MP"},
 //     {"FRIDAY", "IT", "EM", "ME", "HO", "MI", "MI"}
 // };
-const int mapping[5][6] PROGMEM= {
+const byte mapping[5][6] PROGMEM= {
     {1, 4, 5, 6, 7, 8},    // 0th Element = Monday
     {2, 4, 6, 8, 3, 5},    // 1st Element = Tuesday
     {4, 5, 6, 2, 1, 3},
     {1, 4, 5, 6, 7, 5},
     {4, 5, 6, 2, 1, 5}
 };
-char attendance[5][6][5];
+char attendance[5][6][2];
 RTC_DS1307 rtc;
-int currentDay = rtc.now().dayOfTheWeek();
+byte currentDay = rtc.now().dayOfTheWeek();
 void setup() {
   Serial.begin(9600);
-  for (int i = 0; i < 5; i++)
+  Serial.println("HI");
+  for (byte i = 0; i < 5; i++)
   {
-    for (int j = 0; j < 6; j++)
+    for (byte j = 0; j < 6; j++)
     {
         attendance[i][j][0] = '\0'; // Null-terminate the string
     }
@@ -75,23 +76,22 @@ void setup() {
 
    while (!Serial); 
   delay(100);
-  // Serial.println(F("\n\nAdafruit finger detect test"));
+  Serial.println(F("\n\nAdafruit finger detect test"));
 
-  // set the data rate for the sensor serial port
-  //finger.begin(57600);
-  // delay(5);
-  // if (finger.verifyPassword())
-  // {
-  //   Serial.println("Found fingerprint sensor!");
-  // }
-  // else
-  // {
-  //   Serial.println("Did not find fingerprint sensor :(");
-  //   while (1)
-  //   {
-  //     delay(1);
-  //   }
-  // }
+  finger.begin(57600);
+  delay(5);
+  if (finger.verifyPassword())
+  {
+    Serial.println("Found fingerprint sensor!");
+  }
+  else
+  {
+    Serial.println("Did not find fingerprint sensor :(");
+    while (1)
+    {
+      delay(1);
+    }
+  }
   
   DisplayTable((const char **)subject,attendance,currentDay);
 
@@ -100,9 +100,9 @@ void loop() {
   if(InterruptFlag)
   {
     // int mapping = pgm_read_word(&mapping[]);
-        int day = rtc.now().dayOfTheWeek();
-        int hour= rtc.now().hour();
-        int mappingVal;
+        byte day = rtc.now().dayOfTheWeek();
+        byte hour= rtc.now().hour();
+        byte mappingVal;
 
         if (day == 0 || day == 6) 
           return 0;    // if the day is sat or sunday come out of the if condition
@@ -110,17 +110,17 @@ void loop() {
         if (hour < 12) {  
             mappingVal= pgm_read_word(&(mapping[day-1][hour-9]));                    // excluding 12pm
             if (checkFingerprintID()== mappingVal) {
-                strcpy(attendance[day-1][hour-9], "pres");
+                strcpy(attendance[day-1][hour-9], "p");
             } else {
-                strcpy(attendance[day-1][hour-9], "abs");
+                strcpy(attendance[day-1][hour-9], "a");
 
             }
         } else if (hour > 12) {
             mappingVal= pgm_read_word(&(mapping[day-1][hour-10])); 
             if (checkFingerprintID()== mappingVal) {
-                strcpy(attendance[day-1][hour-10], "pres");
+                strcpy(attendance[day-1][hour-10], "p");
             } else {
-                strcpy(attendance[day-1][hour-10], "abs");
+                strcpy(attendance[day-1][hour-10], "a");
             }
         }    
     InterruptFlag=false;
@@ -132,27 +132,27 @@ void isr()
 {
   InterruptFlag= true;
 }
-void DisplayTable(const char* subject[],  char attendance[][6][5], int day)
+void DisplayTable(const char* subject[],  char attendance[][6][2], int day)
 {
   display.clearDisplay();
   //draw arrows 
-  int arrowSize = 5; // Smaller arrow size
-  int arrowX = 0; // Initial position for left arrow
-  int arrowY = SCREEN_HEIGHT - (2 * arrowSize); // Leave enough space for two arrows
+  byte arrowSize = 5; // Smaller arrow size
+  byte arrowX = 0; // Initial position for left arrow
+  byte arrowY = SCREEN_HEIGHT - (2 * arrowSize); // Leave enough space for two arrows
   display.fillTriangle(arrowX, arrowY + arrowSize, arrowX + arrowSize, arrowY, arrowX + arrowSize, arrowY + (2 * arrowSize), WHITE); 
   arrowX = SCREEN_WIDTH - arrowSize; // Rightmost position for right arrow
   display.fillTriangle(arrowX + arrowSize, arrowY + arrowSize, arrowX, arrowY, arrowX, arrowY + (2 * arrowSize), WHITE);
 
   // Draw 3x2 table of rectangles
-  int rectWidth = 42; // Adjusted width to fit within the screen
-  int rectHeight = 27; // Adjusted height to fit within the screen
-  int count=1;
-  for (int row = 0; row < 2; row++)
+  byte rectWidth = 42; // Adjusted width to fit within the screen
+  byte rectHeight = 27; // Adjusted height to fit within the screen
+  byte count=1;
+  for (byte row = 0; row < 2; row++)
   {
-     for (int col = 0; col < 3; col++)
+     for (byte col = 0; col < 3; col++)
     {
-      int x = col * (rectWidth);
-      int y = row * (rectHeight);
+      byte x = col * (rectWidth);
+      byte y = row * (rectHeight);
       
       display.drawRect(x, y, rectWidth, rectHeight, WHITE);
 
@@ -163,12 +163,12 @@ void DisplayTable(const char* subject[],  char attendance[][6][5], int day)
         display.setTextColor(WHITE); // Set text color
         display.setCursor(x + rectWidth - 13, y + rectHeight - 10);     
         display.print(subject[day-2][count]);        
-        if(attendance[day-2][count-1]=="pres")
+        if(attendance[day-2][count-1]=="p")
         {
         display.drawLine(x + 5, y + 10, x + 10, y + 20, WHITE);
         display.drawLine(x + 10, y + 20, x + 30, y + 5, WHITE);
         }
-        else if(attendance[day-2][count-1]=="abs")
+        else if(attendance[day-2][count-1]=="a")
         {
         display.drawLine(x + 5, y + 4, x + 22, y + 20, WHITE);
         display.drawLine(x + 5, y + 20, x + 22, y + 4, WHITE);
@@ -179,9 +179,9 @@ void DisplayTable(const char* subject[],  char attendance[][6][5], int day)
     }
   }
   // Calculate the position for "Monday" text
-  int textWidth = 7 * 6;                       // Assuming each character occupies 6 pixels
-  int textX = (SCREEN_WIDTH - textWidth) / 2;  // Center text horizontally
-  int textY = SCREEN_HEIGHT - 8;               // Bottom of the screen with some margin
+  byte textWidth = 7 * 6;                       // Assuming each character occupies 6 pixels
+  byte textX = (SCREEN_WIDTH - textWidth) / 2;  // Center text horizontally
+  byte textY = SCREEN_HEIGHT - 8;               // Bottom of the screen with some margin
 
   // Set text properties and display "Monday" text
   display.setTextSize(1);
@@ -194,31 +194,31 @@ void DisplayTable(const char* subject[],  char attendance[][6][5], int day)
  
 // Function to check if the scanned fingerprint matches a stored fingerprint and return the ID if a match is found
 uint8_t checkFingerprintID() {
-  // uint8_t p = finger.getImage(); // Capture fingerprint image
-  // if (p != FINGERPRINT_OK) {
-  //   // Serial.println("Failed to capture fingerprint");
-  //   return 0; // Return 0 to indicate failure
-  //   // Serial.println("E");
-  // }
+  uint8_t p = finger.getImage(); // Capture fingerprint image
+  if (p != FINGERPRINT_OK) {
+    // Serial.println("Failed to capture fingerprint");
+    return 0; // Return 0 to indicate failure
+    // Serial.println("E");
+  }
 
-  // p = finger.image2Tz(); // Convert image to template
-  // if (p != FINGERPRINT_OK) {
-  //   // Serial.println("Failed to convert image to template");
-  //   return 0; // Return 0 to indicate failure
-  // }
+  p = finger.image2Tz(); // Convert image to template
+  if (p != FINGERPRINT_OK) {
+    // Serial.println("Failed to convert image to template");
+    return 0; // Return 0 to indicate failure
+  }
 
-  // // Search for a matching fingerprint template
-  // p = finger.fingerFastSearch();
-  // if (p == FINGERPRINT_OK) {
-  //   uint16_t matchedID = finger.fingerID; // Get matched fingerprint ID
-  //   // Serial.print("Matched fingerprint ID: ");
-  //   // Serial.println(matchedID);
-  //   return matchedID;
-  // } else {
-  //   // Serial.println("No matching fingerprint found");
-  //   return 0; // Return 0 to indicate failure
-  // }
-  // else {return 0;}
+  // Search for a matching fingerprint template
+  p = finger.fingerFastSearch();
+  if (p == FINGERPRINT_OK) {
+    uint16_t matchedID = finger.fingerID; // Get matched fingerprint ID
+    // Serial.print("Matched fingerprint ID: ");
+    // Serial.println(matchedID);
+    return matchedID;
+  } else {
+    // Serial.println("No matching fingerprint found");
+    return 0; // Return 0 to indicate failure
+  }
+    // else {return 0;}
 }
 void leftButtonISR()
 {
@@ -230,7 +230,6 @@ void leftButtonISR()
     }
     // Redraw the schedule for the new day
     DisplayTable((const char **)subject,attendance,currentDay);
-      delay(200); // Debounce delay
   // Code to execute when the left button is pressed
 
 }
@@ -243,9 +242,5 @@ void rightButtonISR()
     }
     // Redraw the schedule for the new day
     DisplayTable((const char **)subject,attendance,currentDay);
-    delay(200);
+ 
 }
-
-
-
-
